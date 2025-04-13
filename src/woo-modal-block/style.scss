@@ -1,0 +1,119 @@
+/**
+ * The following styles get applied both on the front of your site
+ * and in the editor.
+ *
+ * Replace them with your own styles or remove the file completely.
+ */
+
+.wp-block-create-block-woo-modal-block {
+	color: #000;
+}
+
+/* オーバーレイ */
+.eb_overlay {
+	/* 位置を固定 */
+	position: fixed;
+	top: 0;
+	left: 0;
+	/* 画面いっぱいに広がるようにする */
+	width: 100%;
+	height: 100vh;
+	/* rgbaを使って60%の黒いオーバーレイにする */
+	background: rgba(0, 0, 0, 0.6);
+	/* デフォルトでは見えないようにする */
+	opacity: 0;
+	visibility: hidden;
+	/* 表示する際の変化の所要時間 */
+	transition: .3s;
+	z-index: 999998;
+}
+
+/* activeクラスのついたオーバーレイ */
+.eb_overlay.active {
+	/* activeクラスがついたときにオーバーレイを表示する */
+	opacity: 1;
+	visibility: visible;
+}
+
+/* モーダルウィンドウ */
+.eb_modal {
+	max-width: 500px;
+	width: 86%;
+	padding: 15px 20px;
+	background: #fff;
+	/* 位置の調整(真ん中に表示) */
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	/* デフォルトでは非表示にしておく */
+	opacity: 0;
+	visibility: hidden;
+	/* 表示の変化にかかる時間 */
+	transition: .3s;
+	z-index: 999999;
+}
+
+/* activeクラスのついたモーダルウィンドウ */
+.eb_modal.active {
+	opacity: 1;
+	visibility: visible;
+}
+
+/* モーダルウィンドウ内の閉じるボタン */
+.eb_modal .eb_close {
+	position: absolute;
+	top: 10px;
+	right: 20px;
+	cursor: pointer;
+	font-size: 20px;
+	z-index: 99999;
+}
+
+/* スクロールできる高さを出すための設定 */
+.eb_section {
+	height: 200vh;
+}
+
+.eb_modal .eb_modalitem { display: none; }
+.eb_modal ul li { list-style: none; }
+.eb_modal ul li span.kinds {
+	float: left;
+	height: 100%;
+	margin-top: 10px;
+}
+
+.eb_modal div.quantity { position: relative; width:130px!important; margin-left: calc(100% - 130px); }
+.eb_modal div.quantity .tm-qty-minus { left: 1px; }
+.eb_modal div.quantity .tm-qty-plus { right: 1px; }
+.eb_modal div.quantity .tm-qty-minus, div.quantity .tm-qty-plus {
+	position: absolute;
+	top: 1px;
+	height: calc(100% - 2px);
+	cursor: pointer;
+	text-align: center;
+	width: 45px;
+	line-height: 46px;
+}
+
+.eb_modal div.quantity .tm-qty-minus:before { content: "\2212"; font-family: "Font Awesome 6 Free"; }
+.eb_modal div.quantity .tm-qty-plus:before { content: "\2b"; font-family: "Font Awesome 6 Free"; }
+.eb_modal div.quantity input.qty {
+	width: 130px!important;
+	padding: 9px 10px 10px !important;
+	text-align: center !important;
+	border: 1px solid rgb(235,235,235) !important;
+	border-radius: 2px!important;
+	line-height: 28px!important;
+}
+
+.eb_modal .qty::-webkit-inner-spin-button,
+.eb_modal .qty::-webkit-outer-spin-button {
+	-webkit-appearance: none;
+	margin: 0;
+	-moz-appearance:textfield;
+}
+
+.single .entry-summary button.single_add_to_cart_button {
+	width: calc(100% - 145px);
+}

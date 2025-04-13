@@ -1,0 +1,44 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "create-block/woo-modal-block",
+  "version": "0.1.0",
+  "title": "Woo Modal Block",
+  "category": "woocommerce",
+  "icon": "smiley",
+  "description": "モーダルウィンドウから商品をカートへ追加します",
+  "attributes": {
+    "titleField": {
+      "type": "string"
+    },
+    "itemField": {
+      "type": "string"
+    },
+    "txtVars1": {
+      "type": "string"
+    },
+    "txtVars1val": {
+      "type": "string"
+    },
+    "toggleField": {
+      "type": "boolean"
+    },
+    "txtVars2": {
+      "type": "string"
+    },
+    "txtVars2val": {
+      "type": "string"
+    },
+    "btnText": {
+      "type": "string"
+    }
+  },
+  "example": {},
+  "supports": {
+    "html": false
+  },
+  "textdomain": "woo-modal-block",
+  "editorScript": "file:./index.js",
+  "editorStyle": "file:./index.css",
+  "style": "file:./style-index.css"
+}
