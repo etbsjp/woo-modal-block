@@ -2,15 +2,14 @@
 /*-------------------------------------------*/
 /* プラグインのアップデートチェック
 /*-------------------------------------------*/
-//require 'inc/plugin-update-checker/plugin-update-checker.php';
-/*require 'plugin-update-checker/plugin-update-checker.php';
+require 'plugin-update-checker/plugin-update-checker.php';
 use YahnisElsts\PluginUpdateChecker\v5\PucFactory;
 $myUpdateChecker = PucFactory::buildUpdateChecker(
 	'https://github.com/etbsjp/woo-modal-block/',
 	__FILE__,
 	'woo-modal-block'
 );
-$myUpdateChecker->setBranch( 'dist' );*/
+$myUpdateChecker->setBranch( 'dist' );
 
 /*-------------------------------------------*/
 /* JS/CSS 追加

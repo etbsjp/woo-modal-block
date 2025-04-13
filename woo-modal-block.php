@@ -5,7 +5,9 @@
  * Version:           0.1.0
  * Requires at least: 6.7
  * Requires PHP:      7.4
- * Author:            Dai Matsuda
+ * Author: DAI
+ * Author URI: https://etbs.jp
+ * Plugin URI: https://etbs.jp/product-category/woo-modal-block/
  * License:           GPL-2.0-or-later
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain:       woo-modal-block
