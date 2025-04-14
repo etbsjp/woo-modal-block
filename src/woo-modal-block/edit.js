@@ -82,12 +82,12 @@ export default function Edit( { attributes, setAttributes } ) {
 						onChange={ onChangeItemField }
 					/>
 					<TextareaControl
-						label="バリエーションリスト1ラベル"
+						label="バリエーションリスト1ラベル(必須)"
 						value={ txtVars1 }
 						onChange={ onChangeTextareaField1 }			
 					/>
 					<TextareaControl
-						label="バリエーションリスト1値"
+						label="バリエーションリスト1値(必須)"
 						help="商品のバリエーションに使用した内容を入力してください"
 						value={ txtVars1val }
 						onChange={ onChangeTextareaValue1 }			

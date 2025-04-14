@@ -52,7 +52,7 @@ export default function save( { attributes } ) {
 					))}
 				</ul>
 				<div class="wp-block-vk-blocks-button vk_button vk_button-color-custom vk_button-align-center">
-					<a href="#" class="vk_button_link btn has-background has-vk-color-primary-background-color btn-md" role="button" aria-pressed="true" rel="noopener">
+					<a href="#" class="vk_button_link btn has-background has-vk-color-primary-background-color btn-md" role="button" aria-pressed="true" rel="noopener" style="pointer-events: none;">
 						<div class="vk_button_link_caption"><span class="vk_button_link_txt">{ btnText }</span></div>
 					</a>
 				</div>

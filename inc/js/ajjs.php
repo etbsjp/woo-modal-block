@@ -6,7 +6,13 @@ $surl = site_url();
 $script = <<< EOF
 function etbs_woo_item_search(){
 	var mesA = jQuery("#itemname").text();
+	if (!mesA || mesA.trim() === "") {
+		mesA = "@@none";
+	}
 	var mesB = jQuery("select.eb_modal_select_date").val();
+	if (typeof mesB === "undefined" || mesB === null) {
+		mesB = "@@none";
+	}
 	var cnt1 = jQuery("#itemname").attr('cnt1');
 	for (let i = 0; i < cnt1; i++) {
 		if( i == 0 ){
@@ -15,7 +21,7 @@ function etbs_woo_item_search(){
 			mes0 += "##" + jQuery("#kinds" + i).text();
 		}
 	}
-	console.log(mesA + "||" + mesB + "||" + mes0);
+	console.log( mesA + "||" + mesB + "||" + mes0 );
 	jQuery.ajax({
 		type: "POST",
 		url: "{$ajaxurl}",
@@ -24,6 +30,7 @@ function etbs_woo_item_search(){
 			"mes"   : mesA + "||" + mesB + "||" + mes0,
 		},
 		success: function( response ){
+			console.log( response );
 			var pid = response.split('||');
 			var cnt1 = jQuery("#itemname").attr('cnt1');
 			for (let i = 0; i < cnt1; i++) {
@@ -37,7 +44,7 @@ function etbs_woo_item_search(){
 
 jQuery(function() {
   jQuery("select.eb_modal_select_date").change(function () {
-    var val = jQuery("select.eb_modal_select_date").val();
+	var val = jQuery("select.eb_modal_select_date").val();
 	if( val == 0 ) {
 		var cnt1 = jQuery("#itemname").attr('cnt1');
 		for (let i = 0; i < cnt1; i++) {
@@ -79,7 +86,15 @@ function etbs_woo_item_quantity() {
 }
 
 jQuery('[name^=quantity]').change(function() {
-	etbs_woo_item_quantity();
+	setTimeout(() => {
+		etbs_woo_item_search();
+		setTimeout(() => {
+			etbs_woo_item_quantity();
+			setTimeout(() => {
+				jQuery(".eb_modal a.btn").css( "pointer-events", "auto" );
+			}, 200);
+		}, 1900);
+	}, 100);
 });
 
 EOF;
