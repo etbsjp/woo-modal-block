@@ -5,8 +5,9 @@
 if ( ! function_exists( 'etbs_woo_modal_block_scripts' ) ){
 	function etbs_woo_modal_block_scripts() {
 		global $woomb_version;
-		wp_enqueue_script( 'cart-js', plugins_url( '/woo-modal-block/inc/js/cart.js' ), array( 'jquery' ), $woomb_version, true );
+		wp_enqueue_script( 'cartjs', plugins_url( '/woo-modal-block/inc/js/cart.js' ), array( 'jquery' ), $woomb_version, true );
 		wp_enqueue_script( 'ajjs', plugins_url( '/woo-modal-block/inc/js/ajjs.php' ), array( 'jquery' ), $woomb_version, true );
+		wp_enqueue_script( 'overlay', plugins_url( '/woo-modal-block/inc/js/overlay.js'), array( 'jquery' ), $woomb_version, true );
 	}
 	add_action( 'wp_enqueue_scripts', 'etbs_woo_modal_block_scripts' );
 }
