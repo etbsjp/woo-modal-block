@@ -106,7 +106,7 @@ if ( ! function_exists( 'etbs_woo_title_search' ) ){
 		wp_die($list);
 	}
 	add_action( 'wp_ajax_etbs_woo_title_search', 'etbs_woo_title_search' );
-	//add_action( 'wp_ajax_nopriv_etbs_woo_title_search', 'etbs_woo_title_search' );
+	add_action( 'wp_ajax_nopriv_etbs_woo_title_search', 'etbs_woo_title_search' );
 }
 
 ?>
