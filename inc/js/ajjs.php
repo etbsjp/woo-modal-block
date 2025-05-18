@@ -21,7 +21,6 @@ function etbs_woo_item_search(){
 			mes0 += "##" + jQuery("#kinds" + i).text();
 		}
 	}
-	console.log( mesA + "||" + mesB + "||" + mes0 );
 	jQuery.ajax({
 		type: "POST",
 		url: "{$ajaxurl}",
@@ -30,7 +29,6 @@ function etbs_woo_item_search(){
 			"mes"   : mesA + "||" + mesB + "||" + mes0,
 		},
 		success: function( response ){
-			console.log( response );
 			var pid = response.split('||');
 			var cnt1 = jQuery("#itemname").attr('cnt1');
 			for (let i = 0; i < cnt1; i++) {
