@@ -17,12 +17,12 @@ import { useBlockProps } from '@wordpress/block-editor';
  */
 export default function save( { attributes } ) {
 	const { titleField, itemField, txtVars1, txtVars2, txtVars1val, txtVars2val, toggleField, btnText } = attributes;
-	var txt1l = txtVars1.split("\n");
-	var txt1v = txtVars1val.split("\n");
+	var txt1l = (typeof txtVars1 === 'string' ? txtVars1 : '').split("\n");
+	var txt1v = (typeof txtVars1val === 'string' ? txtVars1val : '').split("\n");
 	var txt1c = txt1v.length;
 	if( toggleField ) {
-		var txt2l = txtVars2.split("\n");
-		var txt2v = txtVars2val.split("\n");
+		var txt2l = (typeof txtVars2 === 'string' ? txtVars2 : '').split("\n");
+		var txt2v = (typeof txtVars2val === 'string' ? txtVars2val : '').split("\n");
 		var txt2c = txt2v.length;
 	}
 	return (
