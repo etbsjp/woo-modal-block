@@ -45,6 +45,9 @@ directory take precedence. For example, `/assets/screenshot-1.png` would win ove
 
 == Changelog ==
 
+* [ Security Fix ] Restrict the unauthenticated product search AJAX endpoint to published products only, and add limits to the search and add-to-cart request parameters
+* [ Bug Fix ] Deliver a required script as a static file instead of a PHP file executed inside the plugin directory, avoiding failures on hosts that block direct PHP execution there
+
 = 0.1.0 =
 * Release
 
