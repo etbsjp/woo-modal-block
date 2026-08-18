@@ -19,7 +19,7 @@ if ( ! function_exists( 'etbs_woo_modal_block_scripts' ) ){
 			'ajaxurl' => admin_url( 'admin-ajax.php' ),
 			'siteurl' => site_url(),
 		) );
-		wp_enqueue_script( 'overlay', plugins_url( '/woo-modal-block/inc/js/overlay.js'), array( 'jquery' ), $woomb_version, true );
+		wp_enqueue_script( 'overlay', plugins_url( 'inc/js/overlay.js', WOOMB_PLUGIN_FILE ), array( 'jquery' ), $woomb_version, true );
 	}
 	add_action( 'wp_enqueue_scripts', 'etbs_woo_modal_block_scripts' );
 }
@@ -44,27 +44,27 @@ if ( ! function_exists( 'etbs_woo_redirecct_url' ) ){
 			if( strpos( $add_to_cart, '||' ) !== false && strpos( $quantity, '||' ) !== false ) {
 				$items = explode( '||', $add_to_cart );
 				$value = explode( '||', $quantity );
-				$c1 = count($items);
-				$c2 = count($value);
+				// 件数の一致判定は上限キャップ前の元の件数で行う。
+				// キャップ後の値で比較すると、例えば25件と20件のような本来不一致であるべき組み合わせが
+				// 「どちらも20」に丸められて一致判定されてしまい、意図しないカート追加が起きるため。
+				// Compare the item/quantity counts BEFORE capping them at the limit.
+				// Comparing the capped values would make mismatched counts (e.g. 25 vs 20) both become
+				// 20 and be treated as matching, causing unintended cart additions.
+				$c1 = count( $items );
+				$c2 = count( $value );
 
-				// 上限（20件）を超える要求は先頭20件のみを処理する（無制限ループ対策）。
-				// Cap processing at the first 20 items when more are requested, to prevent an unbounded loop.
-				if ( $c1 > 20 ) {
-					$c1 = 20;
-				}
-				if ( $c2 > 20 ) {
-					$c2 = 20;
-				}
-
-				if( $c1 == $c2 ) {
-					for( $i = 0; $i < $c1; $i++ ) {
+				if ( $c1 === $c2 ) {
+					// 上限（20件）を超える要求は先頭20件のみを処理する（無制限ループ対策）。
+					// Cap processing at the first 20 items when more are requested, to prevent an unbounded loop.
+					$count = min( $c1, 20 );
+					for ( $i = 0; $i < $count; $i++ ) {
 						// quantity は整数化し、0以下のアイテムはカート追加をスキップする。
 						// Normalize quantity to an integer and skip items whose quantity is 0 or less.
 						$qty = absint( $value[ $i ] );
 						if ( $qty <= 0 ) {
 							continue;
 						}
-						WC()->cart->add_to_cart( $items[$i], $qty );
+						WC()->cart->add_to_cart( $items[ $i ], $qty );
 					}
 				}
 				wp_redirect( wc_get_cart_url() );
