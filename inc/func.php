@@ -142,7 +142,15 @@ if ( ! function_exists( 'etbs_woo_title_search' ) ){
 		// 上限（20件）を超えるリクエストは一切処理しない（無制限ループ対策）。
 		// Refuse to process the request at all when it exceeds the 20-item limit (prevents an unbounded loop).
 		if ( count( $likes ) > 20 ) {
-			wp_die( '' );
+			// 処理は拒否するが、空文字だけは語数ぶん返す。空文字を1個だけ返すと JS 側の
+			// response.split('||') が要素1個になり、pid[1] 以降が undefined になる。
+			// jQuery の attr( name, undefined ) はセッターではなくゲッターとして働くため、
+			// 2枠目以降に前回検索時の postid が残り、利用者が選んでいない商品がカートに入る。
+			// Refuse to process, but still return one empty slot per term. Returning a single
+			// empty string would make response.split('||') yield one element, leaving pid[1]
+			// and beyond undefined; jQuery's attr( name, undefined ) acts as a getter, so the
+			// previous postid would remain and an unselected product could end up in the cart.
+			wp_die( implode( '||', array_fill( 0, min( count( $likes ), 100 ), '' ) ) );
 		}
 
 		// 語ごとに必ず1要素を積む。aj.js は response.split('||') の添字を quantity{i} の
@@ -174,7 +182,7 @@ if ( ! function_exists( 'etbs_woo_title_search' ) ){
 						AND p.post_title LIKE %s
 						AND p.post_status = 'publish'
 						AND ( p.post_type != 'product_variation' OR parent.post_status = 'publish' )
-						ORDER BY p.ID ASC LIMIT 1 ";
+						LIMIT 1 ";
 					$lists = $wpdb->get_results(
 						$wpdb->prepare($query, $key, $like0), 'ARRAY_A');
 					break;
@@ -186,7 +194,7 @@ if ( ! function_exists( 'etbs_woo_title_search' ) ){
 						AND p.post_title LIKE %s
 						AND p.post_status = 'publish'
 						AND ( p.post_type != 'product_variation' OR parent.post_status = 'publish' )
-						ORDER BY p.ID ASC LIMIT 1 ";
+						LIMIT 1 ";
 					$lists = $wpdb->get_results(
 						$wpdb->prepare($query, $key, $like0, $like1), 'ARRAY_A');
 					break;
@@ -199,7 +207,7 @@ if ( ! function_exists( 'etbs_woo_title_search' ) ){
 						AND p.post_title LIKE %s
 						AND p.post_status = 'publish'
 						AND ( p.post_type != 'product_variation' OR parent.post_status = 'publish' )
-						ORDER BY p.ID ASC LIMIT 1 ";
+						LIMIT 1 ";
 					$lists = $wpdb->get_results(
 						$wpdb->prepare($query, $key, $like0, $like1, $like2), 'ARRAY_A' );
 					break;
