@@ -1,4 +1,8 @@
 <?php
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly.
+}
+
 /*-------------------------------------------*/
 /* JS/CSS 追加
 /*-------------------------------------------*/
@@ -141,9 +145,22 @@ if ( ! function_exists( 'etbs_woo_title_search' ) ){
 			wp_die( '' );
 		}
 
-		$list = '';
-		$a = 1;
+		// 語ごとに必ず1要素を積む。aj.js は response.split('||') の添字を quantity{i} の
+		// 並びに対応させているため、ヒットしなかった語を詰めると i 番目の枠へ別商品のIDが入る。
+		// Always push exactly one element per term. aj.js maps the index of
+		// response.split('||') to the quantity{i} inputs, so collapsing a miss would put
+		// another product's ID into that slot.
+		$ids = array();
 		foreach ($likes as $like) {
+			$like = trim( $like );
+			// 空語は検索しない。LIKE '%%' は全件走査になり、未認証の1リクエストから
+			// 最大20回起こせる（取り出した行のうち使うのは1件だけ）。
+			// Skip empty terms: LIKE '%%' scans every row and can be triggered up to 20
+			// times per unauthenticated request, while only one row is ever used.
+			if ( '' === $like ) {
+				$ids[] = '';
+				continue;
+			}
 			$like0 = '%' . $wpdb->esc_like( $like ) . '%';
 			switch ($case) {
 				case 1:
@@ -156,7 +173,8 @@ if ( ! function_exists( 'etbs_woo_title_search' ) ){
 						WHERE p.post_type LIKE %s
 						AND p.post_title LIKE %s
 						AND p.post_status = 'publish'
-						AND ( p.post_type != 'product_variation' OR parent.post_status = 'publish' ) ";
+						AND ( p.post_type != 'product_variation' OR parent.post_status = 'publish' )
+						ORDER BY p.ID ASC LIMIT 1 ";
 					$lists = $wpdb->get_results(
 						$wpdb->prepare($query, $key, $like0), 'ARRAY_A');
 					break;
@@ -167,7 +185,8 @@ if ( ! function_exists( 'etbs_woo_title_search' ) ){
 						AND p.post_title LIKE %s
 						AND p.post_title LIKE %s
 						AND p.post_status = 'publish'
-						AND ( p.post_type != 'product_variation' OR parent.post_status = 'publish' ) ";
+						AND ( p.post_type != 'product_variation' OR parent.post_status = 'publish' )
+						ORDER BY p.ID ASC LIMIT 1 ";
 					$lists = $wpdb->get_results(
 						$wpdb->prepare($query, $key, $like0, $like1), 'ARRAY_A');
 					break;
@@ -179,21 +198,15 @@ if ( ! function_exists( 'etbs_woo_title_search' ) ){
 						AND p.post_title LIKE %s
 						AND p.post_title LIKE %s
 						AND p.post_status = 'publish'
-						AND ( p.post_type != 'product_variation' OR parent.post_status = 'publish' ) ";
+						AND ( p.post_type != 'product_variation' OR parent.post_status = 'publish' )
+						ORDER BY p.ID ASC LIMIT 1 ";
 					$lists = $wpdb->get_results(
 						$wpdb->prepare($query, $key, $like0, $like1, $like2), 'ARRAY_A' );
 					break;
 			}
-			if (!empty($lists)) {
-				if ($a == 1) {
-					$list = $lists[0]['ID'];
-				} else {
-					$list .= '||' . $lists[0]['ID'];
-				}
-			}
-			$a++;
+			$ids[] = ! empty( $lists ) ? $lists[0]['ID'] : '';
 		}
-		wp_die($list);
+		wp_die( implode( '||', $ids ) );
 	}
 	add_action( 'wp_ajax_etbs_woo_title_search', 'etbs_woo_title_search' );
 	add_action( 'wp_ajax_nopriv_etbs_woo_title_search', 'etbs_woo_title_search' );
