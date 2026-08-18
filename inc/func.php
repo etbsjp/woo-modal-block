@@ -109,6 +109,23 @@ if ( ! function_exists( 'etbs_woo_title_search' ) ){
 		// unslash してからサニタイズし、以降はサニタイズ済みの値のみを使う。
 		// Unslash then sanitize the raw input; only the sanitized value is used from here on.
 		$mes = sanitize_text_field( wp_unslash( $_POST['mes'] ) );
+
+		// 入力長の上限。件数の検査（count( $likes ) > 20）は explode() が配列を作り終えた
+		// 後にしか走らないため、これが無いと未認証の1リクエストでメモリ確保量を攻撃者が
+		// 決められる（実測: 8MB の POST で語数 4,194,305 個・128MB を確保）。
+		// 8192 は正当な入力が絶対に届かない値にしてある。実データの商品名は最長98バイトで、
+		// 20種類ぶんでも約2,000バイト。ここで弾くと位置を保つ分岐を通らないため、
+		// 通常の超過は必ず count( $likes ) > 20 側が受け止める。
+		// Cap the input length. The item-count check runs only after explode() has already
+		// built the array, so without this an unauthenticated request controls how much
+		// memory is allocated (measured: an 8MB POST yields 4,194,305 items and 128MB).
+		// 8192 is far above any legitimate input (longest product title is 98 bytes; 20 of
+		// them total ~2,000 bytes), so real overflows are still handled by the branch that
+		// preserves slot positions.
+		if ( strlen( $mes ) > 8192 ) {
+			wp_die( '' );
+		}
+
 		$txt = explode( '||', $mes );
 
 		// 想定外の形式（"||" 区切りの要素が3未満）は何も処理せず終了する（undefined array key 対策も兼ねる）。
