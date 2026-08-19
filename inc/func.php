@@ -61,6 +61,32 @@ if ( ! function_exists( 'etbs_woo_modal_block_scripts' ) ){
 }
 
 /*-------------------------------------------*/
+/* ブロックCSS/JSのキャッシュバスティング用バージョン差し替え
+/*-------------------------------------------*/
+if ( ! function_exists( 'etbs_woo_modal_block_override_block_version' ) ) {
+	/**
+	 * このプラグインが登録するブロックの version を、block.json の値ではなく
+	 * プラグイン本体の版数（$woomb_version）に上書きする。
+	 * block.json の version は雛形のまま `0.1.0` 固定になっており、これがそのまま
+	 * style-index.css 等の `?ver=` に使われるため、CSS を更新しても
+	 * 利用者のブラウザキャッシュが割れない。$metadata['name'] で対象ブロックに限定し、
+	 * 他プラグイン・コアブロックの version には触れない。
+	 *
+	 * @param array $metadata block.json から読み込まれたブロックのメタデータ配列。
+	 * @return array 対象ブロックのときだけ version を上書きしたメタデータ配列。
+	 */
+	function etbs_woo_modal_block_override_block_version( $metadata ) {
+		global $woomb_version;
+		// block.json の name（create-block/ 接頭辞込み）で自プラグインのブロックだけを対象にする。
+		if ( isset( $metadata['name'] ) && 'create-block/woo-modal-block' === $metadata['name'] ) {
+			$metadata['version'] = $woomb_version;
+		}
+		return $metadata;
+	}
+	add_filter( 'block_type_metadata', 'etbs_woo_modal_block_override_block_version' );
+}
+
+/*-------------------------------------------*/
 /* WooのURLパラメーターをカスタマイズ
 /*-------------------------------------------*/
 if ( ! function_exists( 'etbs_woo_redirecct_url' ) ){
