@@ -237,4 +237,114 @@ if ( ! function_exists( 'etbs_woo_title_search' ) ){
 	add_action( 'wp_ajax_nopriv_etbs_woo_title_search', 'etbs_woo_title_search' );
 }
 
+/*-------------------------------------------*/
+/* ダッシュボードウィジェット（使い方・サポート案内）
+/*-------------------------------------------*/
+if ( ! function_exists( 'woomb_add_dashboard_widget' ) ) {
+	/**
+	 * ダッシュボードにサポート導線ウィジェットを登録する。
+	 * 商品・カートを扱う機能であるため、権限は manage_woocommerce を要求する。
+	 * Register the support-info dashboard widget.
+	 * Requires manage_woocommerce because this plugin deals with products and the cart.
+	 *
+	 * @return void
+	 */
+	function woomb_add_dashboard_widget() {
+		if ( ! current_user_can( 'manage_woocommerce' ) ) {
+			return;
+		}
+		wp_add_dashboard_widget(
+			'woomb_dashboard_widget',
+			'Woo Modal Block',
+			'woomb_render_dashboard_widget'
+		);
+	}
+	add_action( 'wp_dashboard_setup', 'woomb_add_dashboard_widget' );
+}
+
+if ( ! function_exists( 'woomb_render_dashboard_widget' ) ) {
+	/**
+	 * ダッシュボードウィジェットの本文を出力する。
+	 * Render the dashboard widget content.
+	 *
+	 * @return void
+	 */
+	function woomb_render_dashboard_widget() {
+		?>
+		<p><?php esc_html_e( 'モーダルウィンドウから商品をカートへ追加できるブロックです。', 'woo-modal-block' ); ?><?php esc_html_e( 'バリエーション違いの商品をまとめて選んでもらう用途に向いています。', 'woo-modal-block' ); ?></p>
+
+		<strong><?php esc_html_e( '使い方', 'woo-modal-block' ); ?></strong>
+		<ul style="margin:6px 0 12px 1.2em;list-style:disc;">
+			<li>
+				<?php
+				printf(
+					/* translators: 1: 「Woo Modal Block」（強調タグ付き） 2: 「ボタン」（強調タグ付き） 3: eb_btn（コードタグ付き） */
+					esc_html__( 'ブロックエディタで%1$sブロックを追加します。ブロックの直前に%2$sブロックを配置し、追加CSSクラスに%3$sを指定してください（モーダルを開くトリガーになります）。', 'woo-modal-block' ),
+					'<strong>' . esc_html__( '「Woo Modal Block」', 'woo-modal-block' ) . '</strong>',
+					'<strong>' . esc_html__( '「ボタン」', 'woo-modal-block' ) . '</strong>',
+					'<code>eb_btn</code>'
+				);
+				?>
+			</li>
+			<li><?php esc_html_e( 'ブロック設定パネルでタイトル・商品名・バリエーションのラベルと値を入力します。バリエーションリスト1は必須、リスト2は任意（トグルで有効化）です。', 'woo-modal-block' ); ?></li>
+		</ul>
+
+		<strong><?php esc_html_e( '注意事項', 'woo-modal-block' ); ?></strong>
+		<ul style="margin:6px 0 12px 1.2em;list-style:disc;">
+			<li><?php esc_html_e( '1つのモーダルで扱える商品は20種類までです。', 'woo-modal-block' ); ?><?php esc_html_e( '超えた場合、商品検索・カート追加とも先頭20件のみが処理されます（画面にエラーは表示されません）。', 'woo-modal-block' ); ?></li>
+			<li>
+				<?php
+				printf(
+					/* translators: 1: add-to-cart（コードタグ付き） 2: quantity（コードタグ付き） 3: ||（コードタグ付き） */
+					esc_html__( 'URLパラメーター %1$s と %2$s を %3$s 区切りで渡すと、外部リンクから複数商品を一括でカートへ追加し、カートページへリダイレクトできます。', 'woo-modal-block' ),
+					'<code>add-to-cart</code>',
+					'<code>quantity</code>',
+					'<code>||</code>'
+				);
+				?>
+			</li>
+		</ul>
+
+		<strong><?php esc_html_e( 'サポート', 'woo-modal-block' ); ?></strong>
+		<p style="margin:6px 0 12px;">
+			<?php
+			printf(
+				/* translators: 1: サポートページへのリンク開始タグ 2: リンク終了タグ 3: 寄付ページへのリンク開始タグ 4: リンク終了タグ */
+				esc_html__( '有償サポートやカスタマイズは%1$sこちらのページ%2$sからお問い合わせください。開発の継続は%3$sご支援%4$sで応援いただけます。', 'woo-modal-block' ),
+				'<a href="https://etbs.jp/product-category/wordpress-tools/?utm_source=woo-modal-block&utm_medium=plugin" target="_blank" rel="noopener noreferrer">',
+				'</a>',
+				'<a href="https://etbs.jp/product/donate/?utm_source=woo-modal-block&utm_medium=plugin" target="_blank" rel="noopener noreferrer">',
+				'</a>'
+			);
+			?>
+		</p>
+		<?php
+	}
+}
+
+/*-------------------------------------------*/
+/* 寄付・開発依頼リンク（プラグイン一覧行）
+/*-------------------------------------------*/
+if ( ! function_exists( 'woomb_plugin_row_meta' ) ) {
+	/**
+	 * プラグイン一覧の自プラグイン行に「開発を支援」「開発のご依頼」リンクを追加する。
+	 * Add "Support development" / "Request development" links to this plugin's own row.
+	 *
+	 * @param string[] $links プラグイン行に表示されるリンクの配列。Existing row meta links.
+	 * @param string   $file  相対パス（`plugin_basename()`）で表された対象プラグインファイル。Plugin file the row belongs to (relative, `plugin_basename()` form).
+	 * @return string[] リンクを追加した配列。The links array, with our links appended when this is our own row.
+	 */
+	function woomb_plugin_row_meta( $links, $file ) {
+		if ( plugin_basename( WOOMB_PLUGIN_FILE ) !== $file ) {
+			return $links;
+		}
+		$links[] = '<a href="https://etbs.jp/product/donate/?utm_source=woo-modal-block&utm_medium=plugin" target="_blank" rel="noopener noreferrer">'
+			. esc_html__( '開発を支援', 'woo-modal-block' ) . '</a>';
+		$links[] = '<a href="https://etbs.jp/product-category/wordpress-tools/?utm_source=woo-modal-block&utm_medium=plugin" target="_blank" rel="noopener noreferrer">'
+			. esc_html__( '開発のご依頼', 'woo-modal-block' ) . '</a>';
+		return $links;
+	}
+	add_filter( 'plugin_row_meta', 'woomb_plugin_row_meta', 10, 2 );
+}
+
 ?>
