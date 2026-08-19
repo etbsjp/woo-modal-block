@@ -72,7 +72,13 @@ function etbs_woo_item_quantity() {
 				val += "||" + jQuery("[name=quantity" + i + "]").val();
 			}
 		}
-		var rurl = woombAjData.siteurl + "/store/?add-to-cart=" + pid +  "&quantity=" + val;
+		// カート追加先は PHP 側で解決した URL を使う。cartbase が無い場合（フルページキャッシュで
+		// 古い HTML が配られた場合）のみ、従来の /store/ に落とす。
+		// Use the URL resolved on the PHP side. Fall back to the old /store/ path only when
+		// cartbase is absent, i.e. when a full-page cache served older HTML.
+		var base = woombAjData.cartbase || ( woombAjData.siteurl + "/store/" );
+		var sep  = base.indexOf( "?" ) === -1 ? "?" : "&";
+		var rurl = base + sep + "add-to-cart=" + pid + "&quantity=" + val;
 		jQuery(".eb_modal a.btn").attr( "href", rurl );
 	}
 }

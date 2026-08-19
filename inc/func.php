@@ -15,15 +15,47 @@ if ( ! function_exists( 'etbs_woo_modal_block_scripts' ) ){
 	 */
 	function etbs_woo_modal_block_scripts() {
 		global $woomb_version;
-		wp_enqueue_script( 'cartjs', plugins_url( 'inc/js/cart.js', WOOMB_PLUGIN_FILE ), array( 'jquery' ), $woomb_version, true );
-		wp_enqueue_script( 'ajjs', plugins_url( 'inc/js/aj.js', WOOMB_PLUGIN_FILE ), array( 'jquery' ), $woomb_version, true );
-		// aj.js 内で使う ajaxurl / siteurl を PHP からローカライズして渡す（aj.js は静的ファイルのため PHP 変数を直接埋め込めない）。
-		// Localize ajaxurl / siteurl for aj.js, since it is now a static file and can no longer embed PHP variables directly.
-		wp_localize_script( 'ajjs', 'woombAjData', array(
-			'ajaxurl' => admin_url( 'admin-ajax.php' ),
-			'siteurl' => site_url(),
+		// ハンドル名は woomb_ 接頭辞を付ける。`overlay` のような汎用名は他プラグイン・テーマと
+		// 衝突し、先に登録した側が勝つため、こちらの JS が黙って読まれなくなる（エラーは出ない）。
+		// かつ wp_localize_script() が他人のスクリプトにデータを付けてしまう。
+		// Prefix the handles with woomb_. Generic names like `overlay` collide with other
+		// plugins/themes; the first registration wins, so our script would silently not load
+		// (with no error), and wp_localize_script() would attach data to someone else's script.
+		wp_enqueue_script( 'woomb_cart', plugins_url( 'inc/js/cart.js', WOOMB_PLUGIN_FILE ), array( 'jquery' ), $woomb_version, true );
+		wp_enqueue_script( 'woomb_aj', plugins_url( 'inc/js/aj.js', WOOMB_PLUGIN_FILE ), array( 'jquery' ), $woomb_version, true );
+
+		// カート追加を投げる先の URL を PHP 側で解決して渡す。
+		// カート追加は template_redirect で横取りするため URL 自体はどこでもよいが、実在しない
+		// パス（従来は /store/ 固定）に投げると、404 をページキャッシュしているサーバでは
+		// リクエストが PHP に届かず、カート追加が黙って失敗する。
+		// Resolve the add-to-cart target URL on the PHP side. The request is intercepted at
+		// template_redirect so any URL works, but posting to a path that does not exist
+		// (previously a hard-coded /store/) fails silently on servers that page-cache 404s,
+		// because the request never reaches PHP.
+		$woomb_cart_base = '';
+		if ( function_exists( 'wc_get_page_permalink' ) ) {
+			$woomb_cart_base = wc_get_page_permalink( 'shop' );
+		}
+		// WooCommerce 8.9 の wc_get_page_permalink() は、ショップページが未設定・削除済みでも
+		// 自身で get_home_url() に落とすため、ここが空になるのは WooCommerce 未有効のとき（＝上の
+		// function_exists が false のとき）だけ。念のための最終フォールバックとして残している。
+		// wc_get_page_permalink() already falls back to get_home_url() when the shop page is
+		// missing, so this is only reached when WooCommerce is inactive. Kept as a last resort.
+		if ( ! is_string( $woomb_cart_base ) || '' === $woomb_cart_base ) {
+			$woomb_cart_base = home_url( '/' );
+		}
+
+		// aj.js 内で使う値を PHP からローカライズして渡す（aj.js は静的ファイルのため PHP 変数を直接埋め込めない）。
+		// siteurl は、フルページキャッシュで古い HTML と新しい JS が組み合わさった場合の
+		// フォールバック用に残してある。
+		// Localize the values aj.js needs, since it is a static file and cannot embed PHP variables.
+		// siteurl is kept as a fallback for when a full-page cache pairs old HTML with new JS.
+		wp_localize_script( 'woomb_aj', 'woombAjData', array(
+			'ajaxurl'  => admin_url( 'admin-ajax.php' ),
+			'siteurl'  => site_url(),
+			'cartbase' => $woomb_cart_base,
 		) );
-		wp_enqueue_script( 'overlay', plugins_url( 'inc/js/overlay.js', WOOMB_PLUGIN_FILE ), array( 'jquery' ), $woomb_version, true );
+		wp_enqueue_script( 'woomb_overlay', plugins_url( 'inc/js/overlay.js', WOOMB_PLUGIN_FILE ), array( 'jquery' ), $woomb_version, true );
 	}
 	add_action( 'wp_enqueue_scripts', 'etbs_woo_modal_block_scripts' );
 }
@@ -39,6 +71,16 @@ if ( ! function_exists( 'etbs_woo_redirecct_url' ) ){
 	 * @return void
 	 */
 	function etbs_woo_redirecct_url() {
+		// WooCommerce が無効なら何もしない。ヘッダの `Requires Plugins` は導入時の守りにすぎず、
+		// WooCommerce が fatal で自動停止した場合などは実行時に到達する。ガードが無いと
+		// 未認証の GET 一発で `Call to undefined function WC()` の致命エラー（HTTP 500）になる。
+		// Bail out when WooCommerce is inactive. The `Requires Plugins` header only guards
+		// installation; this path is still reachable if WooCommerce is deactivated at runtime.
+		// Without this guard a single unauthenticated GET triggers a fatal error (HTTP 500).
+		if ( ! function_exists( 'WC' ) || ! function_exists( 'wc_get_cart_url' ) ) {
+			return;
+		}
+
 		if( isset($_GET['add-to-cart']) && isset($_GET['quantity']) ) {
 			// URLパラメーターのため sanitize_text_field() で正規化してから利用する。
 			// These come straight from the URL, so sanitize them before use.
@@ -135,6 +177,20 @@ if ( ! function_exists( 'etbs_woo_title_search' ) ){
 		}
 
 		$key = 'product%';
+
+		// 前後の語も $like0 と同じ規則で扱う。trim して空になった語は「指定なし」（@@none）と
+		// 同じ扱いにする。空語をそのまま渡すと post_title LIKE '%%' という常に真の条件が
+		// SQL に1本増えるだけで、絞り込みには何も寄与しない。
+		// Normalize the leading/trailing terms the same way as $like0: a term that is empty
+		// after trim() is treated as "not specified" (@@none). Passing an empty term through
+		// only adds an always-true post_title LIKE '%%' condition that narrows nothing.
+		foreach ( array( 0, 1 ) as $woomb_i ) {
+			$txt[ $woomb_i ] = trim( $txt[ $woomb_i ] );
+			if ( '' === $txt[ $woomb_i ] ) {
+				$txt[ $woomb_i ] = '@@none';
+			}
+		}
+
 		if( $txt[0] == '@@none' ) {
 			if( $txt[1] == '@@none' ) {
 				$case = 1;
@@ -291,7 +347,7 @@ if ( ! function_exists( 'woomb_render_dashboard_widget' ) ) {
 
 		<strong><?php esc_html_e( '注意事項', 'woo-modal-block' ); ?></strong>
 		<ul style="margin:6px 0 12px 1.2em;list-style:disc;">
-			<li><?php esc_html_e( '1つのモーダルで扱える商品は20種類までです。', 'woo-modal-block' ); ?><?php esc_html_e( '超えた場合、商品検索・カート追加とも先頭20件のみが処理されます（画面にエラーは表示されません）。', 'woo-modal-block' ); ?></li>
+			<li><?php esc_html_e( '1つのモーダルで扱える商品は20種類までです。', 'woo-modal-block' ); ?><?php esc_html_e( '超えた場合、商品IDの検索は行われず、カートには1件も入りません。URLパラメーターから直接追加する場合は先頭20件までが処理されます。いずれも画面にエラーは表示されません。', 'woo-modal-block' ); ?></li>
 			<li>
 				<?php
 				printf(
