@@ -2,7 +2,7 @@
 Contributors:      DAI
 Tags:              woocommerce, block, modal, cart
 Tested up to:      6.7
-Stable tag:        1.0.2
+Stable tag:        1.1.0
 License:           GPL-2.0-or-later
 License URI:       https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -36,9 +36,12 @@ License URI:       https://www.gnu.org/licenses/gpl-2.0.html
 
 == Changelog ==
 
-* [ New Feature ] Add a dashboard widget with usage notes and support links to the plugins list row
-* [ Security Fix ] Restrict the unauthenticated product search AJAX endpoint to published products only, and add limits to the search and add-to-cart request parameters
-* [ Bug Fix ] Deliver a required script as a static file instead of a PHP file executed inside the plugin directory, avoiding failures on hosts that block direct PHP execution there
+= 1.1.0 =
+* [ セキュリティ修正 ] 未ログインでも実行できる商品検索の対象を公開済みの商品だけに限定しました。これまでは下書き・非公開の商品名まで検索の対象になっていました。
+* [ セキュリティ修正 ] 商品検索とカート追加のリクエストに件数と長さの上限を設けました。
+* [ 不具合修正 ] 検索でヒットしなかった商品があると、以降の項目に別の商品が割り当てられることがある不具合を修正しました。
+* [ 不具合修正 ] プラグイン内の PHP ファイルを直接実行して JavaScript を配信する方式をやめ、通常の JavaScript ファイルに変更しました。プラグインディレクトリ内の PHP 実行を禁止しているサーバーでも動作します。
+* [ 機能追加 ] ダッシュボードに使い方と注意事項のウィジェットを追加し、プラグイン一覧の行にサポートへの導線を追加しました。
 
 = 0.1.0 =
 * Release

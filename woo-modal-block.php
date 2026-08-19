@@ -2,7 +2,7 @@
 /**
  * Plugin Name:       Woo Modal Block
  * Description:       モーダルウィンドウから商品をカートへ追加できるプラグインです。
- * Version:           1.0.2
+ * Version:           1.1.0
  * Requires at least: 6.7
  * Requires PHP:      7.4
  * Author: DAI
@@ -14,7 +14,7 @@
  *
  * @package CreateBlock
  */
-$woomb_version = '1.0.2';
+$woomb_version = '1.1.0';
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
