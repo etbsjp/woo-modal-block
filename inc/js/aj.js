@@ -1,9 +1,3 @@
-<?php
-header('Content-Type: application/x-javascript; charset=utf-8');
-require_once( dirname( __FILE__ , 6) . '/wp-load.php' );
-$ajaxurl = admin_url( 'admin-ajax.php');
-$surl = site_url();
-$script = <<< EOF
 function etbs_woo_item_search(){
 	var mesA = jQuery("#itemname").text();
 	if (!mesA || mesA.trim() === "") {
@@ -23,7 +17,7 @@ function etbs_woo_item_search(){
 	}
 	jQuery.ajax({
 		type: "POST",
-		url: "{$ajaxurl}",
+		url: woombAjData.ajaxurl,
 		data: {
 			"action": "etbs_woo_title_search",
 			"mes"   : mesA + "||" + mesB + "||" + mes0,
@@ -78,7 +72,7 @@ function etbs_woo_item_quantity() {
 				val += "||" + jQuery("[name=quantity" + i + "]").val();
 			}
 		}
-		var rurl = "{$surl}" + "/store/?add-to-cart=" + pid +  "&quantity=" + val;
+		var rurl = woombAjData.siteurl + "/store/?add-to-cart=" + pid +  "&quantity=" + val;
 		jQuery(".eb_modal a.btn").attr( "href", rurl );
 	}
 }
@@ -94,6 +88,3 @@ jQuery('[name^=quantity]').change(function() {
 		}, 1900);
 	}, 100);
 });
-
-EOF;
-echo $script;

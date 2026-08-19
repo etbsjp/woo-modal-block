@@ -28,3 +28,28 @@ node_modules/
 
 # dotenv environment variables file
 .env
+
+# old files
+*-old*.*
+*-old.*
+*-old-*.*
+*-old.*.*
+*-backup.*
+*-bak*.*
+*-bak.*
+*-bak-*.*
+*-bak.*.*
+*-copy.*
+*-copy-*.*
+*-copy.*.*
+
+# token files
+*-token.php
+
+# claude files
+.claude.me
+.claude/
+CLAUDE.local.md
+
+# macOS
+.DS_Store

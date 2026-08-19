@@ -1,55 +1,47 @@
 === Woo Modal Block ===
-Contributors:      The WordPress Contributors
-Tags:              block
+Contributors:      DAI
+Tags:              woocommerce, block, modal, cart
 Tested up to:      6.7
-Stable tag:        0.1.0
+Stable tag:        1.1.0
 License:           GPL-2.0-or-later
 License URI:       https://www.gnu.org/licenses/gpl-2.0.html
 
-Example block scaffolded with Create Block tool.
+モーダルウィンドウから商品をカートへ追加できる WooCommerce 用ブロックです。
 
 == Description ==
 
-This is the long description. No limit, and you can use Markdown (as well as in the following sections).
+投稿や固定ページにボタンと一緒に配置すると、モーダルウィンドウから商品をカートへ追加できます（ブロックエディタ用のブロックです）。バリエーション違いの商品をまとめて選んでもらう用途に向いています。
 
-For backwards compatibility, if this section is missing, the full length of the short description will be used, and
-Markdown parsed.
+= 使い方 =
+
+* ブロックエディタで「Woo Modal Block」ブロックを追加します。
+* ブロックの直前に「ボタン」ブロックを配置し、追加CSSクラスに `eb_btn` を指定してください（モーダルを開くトリガーになります）。
+* ブロック設定パネルでタイトル・商品名・バリエーションのラベルと値を入力します。バリエーションリスト1は必須、リスト2は任意です（トグルで有効化）。
+
+= 制限事項 =
+
+* 1つのモーダルで扱える商品は20種類までです。超えた場合、商品検索・カート追加とも先頭20件のみが処理されます（画面にエラーは表示されません）。
 
 == Installation ==
 
-This section describes how to install the plugin and get it working.
-
-e.g.
-
-1. Upload the plugin files to the `/wp-content/plugins/woo-modal-block` directory, or install the plugin through the WordPress plugins screen directly.
-1. Activate the plugin through the 'Plugins' screen in WordPress
-
+1. プラグインファイルを `/wp-content/plugins/woo-modal-block` ディレクトリへアップロードするか、WordPress のプラグイン画面からインストールしてください。
+2. 「プラグイン」画面から本プラグインを有効化してください。
+3. ブロックエディタで「Woo Modal Block」ブロックを追加し、「使い方」に従って設定してください。
 
 == Frequently Asked Questions ==
 
-= A question that someone might have =
+= モーダルが開きません =
 
-An answer to that question.
-
-= What about foo bar? =
-
-Answer to foo bar dilemma.
-
-== Screenshots ==
-
-1. This screen shot description corresponds to screenshot-1.(png|jpg|jpeg|gif). Note that the screenshot is taken from
-the /assets directory or the directory that contains the stable readme.txt (tags or trunk). Screenshots in the /assets
-directory take precedence. For example, `/assets/screenshot-1.png` would win over `/tags/4.3/screenshot-1.png`
-(or jpg, jpeg, gif).
-2. This is the second screen shot
+ブロックの直前に配置した「ボタン」ブロックの追加CSSクラスに `eb_btn` が指定されているかご確認ください。
 
 == Changelog ==
 
+= 1.1.0 =
+* [ セキュリティ修正 ] 未ログインでも実行できる商品検索の対象を公開済みの商品だけに限定しました。これまでは下書き・非公開の商品名まで検索の対象になっていました。
+* [ セキュリティ修正 ] 商品検索とカート追加のリクエストに件数と長さの上限を設けました。
+* [ 不具合修正 ] 検索でヒットしなかった商品があると、以降の項目に別の商品が割り当てられることがある不具合を修正しました。
+* [ 不具合修正 ] プラグイン内の PHP ファイルを直接実行して JavaScript を配信する方式をやめ、通常の JavaScript ファイルに変更しました。プラグインディレクトリ内の PHP 実行を禁止しているサーバーでも動作します。
+* [ 機能追加 ] ダッシュボードに使い方と注意事項のウィジェットを追加し、プラグイン一覧の行にサポートへの導線を追加しました。
+
 = 0.1.0 =
 * Release
-
-== Arbitrary section ==
-
-You may provide arbitrary sections, in the same format as the ones above. This may be of use for extremely complicated
-plugins where more information needs to be conveyed that doesn't fit into the categories of "description" or
-"installation." Arbitrary sections will be shown below the built-in sections outlined above.
