@@ -2,7 +2,7 @@
 Contributors:      DAI
 Tags:              woocommerce, block, modal, cart
 Tested up to:      7.0
-Stable tag:        1.1.1
+Stable tag:        1.1.2
 License:           GPL-2.0-or-later
 License URI:       https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -36,6 +36,7 @@ License URI:       https://www.gnu.org/licenses/gpl-2.0.html
 
 == Changelog ==
 
+= 1.1.2 =
 * [ 不具合修正 ] ブロックを設置していないページを開くとコンソールに JavaScript エラーが表示される不具合を修正
 * [ 不具合修正 ] ブロックの CSS を更新してもブラウザに古いスタイルがキャッシュされたまま残る不具合を修正
 
