@@ -59,3 +59,37 @@ grep -nE "^ \* Version:|woomb_version = |^Stable tag:" woo-modal-block.php readm
 
 ★ readme.txt の `== Changelog ==` には、**必ず `= x.y.z =` の見出しを付けてから**項目を書く。
 見出しの無い項目を直下に置くと、どの版の変更か分からなくなる（実際に一度そうなった）。
+
+## 宣言（Requires）の方針
+
+★★★ **`Requires at least: 6.6` は実測下限。下げてはいけない。**
+8本のうち `Requires at least` を宣言しているのはこのプラグインだけ。
+
+```
+build/woo-modal-block/index.asset.php
+→ array('dependencies' => array('react-jsx-runtime', 'wp-block-editor', 'wp-blocks', 'wp-i18n'), ...)
+```
+
+`react-jsx-runtime` は **WP 6.6 で追加されたスクリプトハンドル**。6.3〜6.5 では未登録なので、
+依存が解決できずエディタ用スクリプトが出力されず、**ブロックが編集画面に出ない**。
+エラーは出ないので、下げた側からは原因が見えない。
+
+★★★ **`apiVersion` だけで判断しない。** `block.json` の `apiVersion: 3` は WP 6.3 以降を意味するため、
+そこだけ見ると「6.3 まで下げられる」と読める（task-queue #111 の起票時に実際そう書かれた）。
+**ブロックがあるなら `build/*/index.asset.php` の `dependencies` を全数見る**
+（正本 `~/.claude/etbs-plugin-rules.md` の「★★★ `Requires at least` も横並びで決めない」）。
+
+★ WP 6.8 の `wp_register_block_types_from_metadata_collection()` と 6.7 の
+`wp_register_block_metadata_collection()` は `function_exists()` で分岐し、最後は
+`register_block_type()` に落ちる（`woo-modal-block.php:44-58`）。**これらは下限を押し上げない。**
+
+★ `readme.txt` に `Requires at least` は書かない（現状も無い）。PUC は readme 側の値でヘッダを
+上書きするため、二重に持つと食い違う。
+
+★ `Requires PHP: 7.4` は据え置き。
+
+★★ **「据え置き」と「新規に足す」は別問題**（2026-08-25 / task-queue #111 で再確認）。
+既に宣言している版を据え置いても新たに締め出す個体は生まれないが、**無宣言のプラグインに
+`Requires PHP` を新しく足すと、いま更新が届いている個体を以後届かなくする**。
+`woo-checkout-colorbox` と `widget-shortcode-tools` が無宣言なのは、この理由による意図的な判断。
+**8本で揃えにこないこと。**
