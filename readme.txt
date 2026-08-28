@@ -1,5 +1,5 @@
 === Woo Modal Block ===
-Contributors:      DAI
+Contributors:      etbsjp
 Tags:              woocommerce, block, modal, cart
 Tested up to:      7.0
 Stable tag:        1.1.2
