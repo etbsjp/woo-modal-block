@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<ruleset name="woo-modal-block">
+    <description>woo-modal-block 用の PHPCS 設定（WordPress-Extra）。CI では phpcs-changed により PR の差分行にのみ適用する。</description>
+
+    <!-- 対象は追跡されている .php ファイル -->
+    <file>.</file>
+    <arg name="extensions" value="php"/>
+
+    <!-- 第三者コード（plugin-update-checker）は指摘対象から除外する -->
+    <exclude-pattern>*/inc/plugin-update-checker/*</exclude-pattern>
+    <exclude-pattern>*/vendor/*</exclude-pattern>
+
+    <!-- ★ build/ は @wordpress/scripts の生成物（blocks-manifest.php / index.asset.php）。
+         index.asset.php の中身はビルドハッシュなので npm run build を含む PR では必ず差分に載り、
+         phpcs-changed が手で直せない行を指して赤くなる。php -l の対象からは外していない。 -->
+    <exclude-pattern>*/build/*</exclude-pattern>
+
+    <arg value="sp"/>
+    <arg name="colors"/>
+
+    <rule ref="WordPress-Extra"/>
+</ruleset>
