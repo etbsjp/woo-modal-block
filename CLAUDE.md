@@ -15,6 +15,34 @@
   （★ 大の定義ファイルには出力形式の指定が無いため、指示しないと合否を機械判定できない）
 - `監査結果: PASS` を受け取るまで PR を作成しない。`FAIL` なら和田へ差し戻して再監査する
 
+## CI（2026-08-28 導入）
+
+**共通ルールは `~/.claude/etbs-plugin-rules.md` の 2.7 節**（standard の選定理由・`phpcbf` を走らせない理由・
+陽性対照・配布物の検証手順など）。ここには **このリポジトリでしか決まらない値**だけを書く。
+
+- 定義は `.github/workflows/ci.yml`。PR ごとに `php -l`（PHP 7.4 / 8.3）と
+  `PHPCS (WordPress-Extra, changed lines)` が走る。`dist` への直 push では `php -l` だけ走る
+- **既存指摘の基準値: 66 ERROR / 11 WARNING**（2026-08-28 実測・`WordPress-Extra`・下記 `build/` 除外あり）。
+  ★ 測り直すときは `vendor/bin/phpcs --standard=./.phpcs.xml.dist --report=summary $(git ls-files '*.php')`
+  の形でのみ行う。素の phpcs は `.gitignore` を尊重せず、`.claude/worktrees/` や `-old` 系まで数える
+- ★★ **`.phpcs.xml.dist` は原本（widget-shortcode-tools）と2点違う。** `<ruleset name>`（`description` の
+  repo 名を含む）と、
+  **`<exclude-pattern>*/build/*</exclude-pattern>`**。`build/blocks-manifest.php` と
+  `build/woo-modal-block/index.asset.php` は `@wordpress/scripts` の**追跡された生成物**で、
+  `index.asset.php` の中身はビルドハッシュ。**`npm run build` を含む PR では必ず差分に載る**ため、
+  除外しないと `phpcs-changed` が**手では直せない行**を指して赤くなる（除外前は 86 E / 30 W）。
+  ★ **`php -l` の対象からは外していない**——壊れた生成物がそのまま配信される経路は塞いだままにする
+- **`Requires PHP: 7.4` を宣言している。** 置き場は `woo-modal-block.php:8` の**1箇所だけ**
+  （`readme.txt` には `Requires` 系を書いていない）。CI の matrix は `['7.4','8.3']` なので、
+  **宣言と matrix が一致している状態を守ること**（片方だけ動かさない）
+- `.gitattributes` は原本より **4エントリ多い**（`.editorconfig` / `package.json` / `package-lock.json` / `src/`。
+  原本9 → 13）。★ **`build/` は export-ignore しない**——ブロックの実体なので配布物に入っていなければならない
+- **原本との差はもう1点ある。** `composer.json` の `name` を `etbsjp/woo-modal-block` に変え、
+  `composer update --lock` で `content-hash` を再生成してある（パッケージの版は原本と同一。
+  pageguard と同じ形。woo-checkout-colorbox / ordermemo は原本のまま）。
+  ★ **原本の `composer.lock` をコピーで上書きしないこと**——落ちずに警告だけ出て完走し、
+  `composer update` を促されて上の基準値が静かにずれる（正本 2.7 節）
+
 ## アンインストール
 
 ★ `uninstall.php` の方針は**案A**（task-queue #108）。判定は3分類。
