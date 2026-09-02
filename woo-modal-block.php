@@ -1,8 +1,8 @@
 <?php
 /**
- * Plugin Name:       Woo Modal Block
+ * Plugin Name:       ETBS Modal Block
  * Description:       モーダルウィンドウから商品をカートへ追加できるプラグインです。
- * Version:           1.1.2
+ * Version:           1.1.3
  * Requires at least: 6.6
  * Requires Plugins:  woocommerce
  * Requires PHP:      7.4

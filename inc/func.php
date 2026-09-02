@@ -337,7 +337,7 @@ if ( ! function_exists( 'woomb_add_dashboard_widget' ) ) {
 		}
 		wp_add_dashboard_widget(
 			'woomb_dashboard_widget',
-			'Woo Modal Block',
+			'ETBS Modal Block',
 			'woomb_render_dashboard_widget'
 		);
 	}

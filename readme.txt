@@ -1,8 +1,7 @@
-=== Woo Modal Block ===
+=== ETBS Modal Block ===
 Contributors:      etbsjp
 Tags:              woocommerce, block, modal, cart
-Tested up to:      7.0
-Stable tag:        1.1.2
+Stable tag:        1.1.3
 License:           GPL-2.0-or-later
 License URI:       https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -35,6 +34,10 @@ License URI:       https://www.gnu.org/licenses/gpl-2.0.html
 ブロックの直前に配置した「ボタン」ブロックの追加CSSクラスに `eb_btn` が指定されているかご確認ください。
 
 == Changelog ==
+
+= 1.1.3 =
+* [ その他 ] プラグインの表示名を「ETBS Modal Block」に変更しました。フォルダ名・設定・更新の受け取りには影響しません。
+* [ その他 ] 動作確認済みの WordPress バージョンの記載を削除しました。実際に確認した範囲を超えて記載していたためです。
 
 = 1.1.2 =
 * [ 不具合修正 ] ブロックを設置していないページを開くとコンソールに JavaScript エラーが表示される不具合を修正
